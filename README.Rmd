@@ -36,6 +36,8 @@ The original benchmark contains 466 data analysis questions:
 # Example
 
 ```{r}
+library(DSEval)
+
 dseval_dataset
 ```
 
