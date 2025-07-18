@@ -1,4 +1,4 @@
-#' DSEval solver
+#' dseval solver
 #' @export
 dseval_solver <- function(solver_chat = NULL) {
   chat <- solver_chat

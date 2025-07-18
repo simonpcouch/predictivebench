@@ -1,2 +1,2 @@
-#' DSEval dataset
+#' dseval dataset
 "dseval_dataset"

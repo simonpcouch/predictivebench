@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# DSEval
+# dseval: A data science LLM evaluation
 
 <!-- badges: start -->
 
@@ -15,16 +15,18 @@ This repository implements an adaptation of
 [DSBench](https://arxiv.org/abs/2409.07703), a data science LLM
 evaluation, in R using [vitals](https://vitals.tidyverse.org/).
 
-The original benchmark contains 466 data analysis questions:
+The original benchmark contains 466 data analysis questions. This
+implementation of the benchmark diverges from the original in a few
+ways:
 
 - In DSBench, each question has a multiple choice answer. This is an
   issue: very seldomly in real life do data science tasks end with a
   multiple choice answer. Also, this increases the risk of sandbagging,
   where models will realize they’re being evaluated and their behavior
-  might change as a result. DSEval rephrases questions to have
+  might change as a result. dseval rephrases questions to have
   open-ended answers.
 - In DSBench, the .xslx, .csv, and other source files are inlined into
-  the user prompt. In DSEval, models are situated in a working directory
+  the user prompt. In dseval, models are situated in a working directory
   where those files exist.
 - File names and references are renamed to be less indicative of
   competition data science / model evaluations, also to descrease the
@@ -43,7 +45,7 @@ The original benchmark contains 466 data analysis questions:
 
 ``` r
 library(tibble)
-library(DSEval)
+library(dseval)
 
 dseval_dataset
 #> # A tibble: 466 × 4

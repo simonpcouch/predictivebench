@@ -1,4 +1,4 @@
-#' DSEval evaluation task
+#' dseval evaluation task
 #' @export
 dseval_task <- function(epochs = 1, dir = ".vitals/logs/") {
   vitals::Task$new(
@@ -6,7 +6,7 @@ dseval_task <- function(epochs = 1, dir = ".vitals/logs/") {
     solver = dseval_solver(),
     scorer = vitals::model_graded_qa(),
     epochs = epochs,
-    name = "DSBench",
+    name = "dseval",
     dir = dir
   )
 }

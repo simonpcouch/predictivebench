@@ -2,10 +2,10 @@
 % Please edit documentation in R/task.R
 \name{dseval_task}
 \alias{dseval_task}
-\title{DSEval evaluation task}
+\title{dseval evaluation task}
 \usage{
 dseval_task(epochs = 1, dir = ".vitals/logs/")
 }
 \description{
-DSEval evaluation task
+dseval evaluation task
 }

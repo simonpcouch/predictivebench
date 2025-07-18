@@ -2,10 +2,10 @@
 % Please edit documentation in R/solver.R
 \name{dseval_solver}
 \alias{dseval_solver}
-\title{DSEval solver}
+\title{dseval solver}
 \usage{
 dseval_solver(solver_chat = NULL)
 }
 \description{
-DSEval solver
+dseval solver
 }

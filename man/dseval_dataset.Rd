@@ -3,7 +3,7 @@
 \docType{data}
 \name{dseval_dataset}
 \alias{dseval_dataset}
-\title{DSEval dataset}
+\title{dseval dataset}
 \format{
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 466 rows and 4 columns.
 }
@@ -11,6 +11,6 @@ An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) w
 dseval_dataset
 }
 \description{
-DSEval dataset
+dseval dataset
 }
 \keyword{datasets}
