@@ -7,3 +7,4 @@ CLAUDE.md
 DSBench/
 ^[.]?air[.]toml$
 ^\.vscode$
+^data-raw$

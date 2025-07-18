@@ -16,7 +16,7 @@ dseval_solver <- function(solver_chat = NULL) {
 
 dseval_solve_one <- function(input, chat) {
   dir <- input$dir
-  instruction <- input$instruction
+  instruction <- input$question
 
   dir_prepped <- prepare_directory(dir)
   withr::defer(unlink(dir_prepped, recursive = TRUE))

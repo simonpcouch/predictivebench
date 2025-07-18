@@ -5,7 +5,7 @@
 \alias{dseval_dataset}
 \title{DSEval dataset}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 466 rows and 5 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 466 rows and 4 columns.
 }
 \usage{
 dseval_dataset

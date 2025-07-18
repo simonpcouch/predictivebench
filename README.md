@@ -46,19 +46,19 @@ library(tibble)
 library(DSEval)
 
 dseval_dataset
-#> # A tibble: 466 × 5
-#>    id                  input            target competition_id metadata        
-#>    <chr>               <list>           <chr>  <chr>          <list>          
-#>  1 00000001_question6  <tibble [1 × 2]> D      00000001       <tibble [1 × 4]>
-#>  2 00000001_question7  <tibble [1 × 2]> D      00000001       <tibble [1 × 4]>
-#>  3 00000001_question8  <tibble [1 × 2]> I      00000001       <tibble [1 × 4]>
-#>  4 00000001_question9  <tibble [1 × 2]> A      00000001       <tibble [1 × 4]>
-#>  5 00000001_question10 <tibble [1 × 2]> H      00000001       <tibble [1 × 4]>
-#>  6 00000001_question11 <tibble [1 × 2]> C      00000001       <tibble [1 × 4]>
-#>  7 00000001_question12 <tibble [1 × 2]> E      00000001       <tibble [1 × 4]>
-#>  8 00000001_question13 <tibble [1 × 2]> H      00000001       <tibble [1 × 4]>
-#>  9 00000001_question14 <tibble [1 × 2]> D      00000001       <tibble [1 × 4]>
-#> 10 00000001_question15 <tibble [1 × 2]> A      00000001       <tibble [1 × 4]>
+#> # A tibble: 466 × 4
+#>    id                  input            target                metadata
+#>    <chr>               <list>           <chr>       <list<tibble[,5]>>
+#>  1 00000001_question10 <tibble [1 × 2]> $34,274,780            [1 × 5]
+#>  2 00000001_question11 <tibble [1 × 2]> 1 Jan 2024             [1 × 5]
+#>  3 00000001_question12 <tibble [1 × 2]> $547,335               [1 × 5]
+#>  4 00000001_question13 <tibble [1 × 2]> $608,446               [1 × 5]
+#>  5 00000001_question14 <tibble [1 × 2]> 72,328                 [1 × 5]
+#>  6 00000001_question15 <tibble [1 × 2]> $12,829,511            [1 × 5]
+#>  7 00000001_question16 <tibble [1 × 2]> $1,927,604             [1 × 5]
+#>  8 00000001_question17 <tibble [1 × 2]> 1661626                [1 × 5]
+#>  9 00000001_question18 <tibble [1 × 2]> 323272                 [1 × 5]
+#> 10 00000001_question6  <tibble [1 × 2]> 75                     [1 × 5]
 #> # ℹ 456 more rows
 ```
 
