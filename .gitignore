@@ -1,0 +1,12 @@
+.Rproj.user
+
+/.quarto/
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+.quarto
+# This is https://drive.google.com/file/d/12pIOJqOSsDBz0eNpq0bjwkLJ8h4HAECB/view?usp=sharing
+DSBench/data/
+# Just omitting for now to focus on the data analysis portion
+DSBench/data_modeling
