@@ -21,33 +21,50 @@ dseval_solve_one <- function(input, chat) {
   dir_prepped <- prepare_directory(dir)
   withr::defer(unlink(dir_prepped, recursive = TRUE))
 
-  instruction_prepped <- paste0(
-    # prompt from the original eval
-    "You are a data analyst. I will give you a background introduction and data analysis question. You must answer the question. ",
-    # custom instructions
-    "You're situated inside of a directory with access to all of the files you should need to complete the task. Do not explore files outside of the directory. You're working autonomously; do not end your turn until you have a final result. There is no end user to respond to questions you may have.",
-    instruction,
-    collapse = "\n\n"
-  )
-
-  chat <- prepare_chat(chat)
-
   # TODO: this should probably actually live inside of a docker container or
   # something more properly sandboxed
   withr::local_dir(dir_prepped)
-  chat$chat(instruction_prepped, echo = FALSE)
 
-  chat
+  assistant <- chat$clone()
+  assistant$set_system_prompt(paste0(
+    assistant$get_system_prompt(),
+    "At some point in the conversation, once you've answered the question, you should notify the user that you have come to an answer with the keyword 'ANSWER: ' followed by your answer. Be sure to ask the user whether it's fine to submit an answer before you do so. Make sure to include the keyword in all caps, followed by a colon, as written."
+  ))
+
+  res <- converse(assistant, instruction = instruction)
+
+  res
 }
 
-prepare_chat <- function(chat) {
-  chat_ <- chat$clone()
-  system_prompt <- chat_$get_system_prompt()
-  if (grepl("## Running code", system_prompt, fixed = TRUE)) {
-    parts <- strsplit(system_prompt, "## Running code")[[1]]
-    chat_$set_system_prompt(parts[2])
+mock_analyst <- function() {
+  ellmer::chat_openai(
+    system_prompt = paste(c(
+      "You are role-playing an analyst using an AI assistant.",
+      "The assistant is helping you carry out a data analysis and may occasionally ask for your feedback on some analytical decision.",
+      "Your job is to keep the conversation going while saying as little as possible.",
+      "If the assistant just checks in to get your thumbs-up on some decision, you might say 'Sounds good.' or something of the like.",
+      "If the assistant asks you an open-ended question, just ask the assistant to use its best judgment.",
+      "If the assistant asks you whether some final answer to your question is satisfactory, affirm it and tell it to use the answer keyword.",
+      "Be terse."
+    )),
+    model = "gpt-4.1-mini"
+  )
+}
+
+converse <- function(assistant, instruction, analyst = mock_analyst()) {
+  assistant_response <- assistant$chat("Hello!", echo = FALSE)
+  assistant_response <- assistant$chat(instruction)
+  analyst$set_turns(list(
+    ellmer::Turn("user", instruction),
+    ellmer::Turn("assistant", assistant$last_turn()@text)
+  ))
+
+  while (!grepl("ANSWER:", assistant_response)) {
+    analyst_response <- analyst$chat(assistant_response)
+    assistant_response <- assistant$chat(analyst_response)
   }
-  chat_
+
+  assistant
 }
 
 # makes a directory that only has the files for analysis inside of it
