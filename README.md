@@ -47,7 +47,7 @@ ways:
 library(tibble)
 library(dseval)
 
-dseval_dataset
+analysis_dataset
 #> # A tibble: 466 × 4
 #>    id                  input            target                metadata
 #>    <chr>               <list>           <chr>       <list<tibble[,5]>>
@@ -65,7 +65,7 @@ dseval_dataset
 ```
 
 ``` r
-tsk <- dseval_task()
+tsk <- analysis_task()
 tsk
 
 tsk$eval(solver_chat = databot:::chat_bot())

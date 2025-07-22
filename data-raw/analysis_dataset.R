@@ -39,7 +39,7 @@ format_input <- function(input) {
   )
 }
 
-create_dseval_dataset <- function() {
+create_analysis_dataset <- function() {
   # the original json is malformed:
   #>   Error in `parse_con()`:
   #> ! parse error: trailing garbage
@@ -47,7 +47,10 @@ create_dseval_dataset <- function() {
   #>                      (right here) ------^
   #
   # so, read it line-by-line
-  metadata_lines <- readLines("DSBench/data_analysis/data.json", warn = FALSE)
+  metadata_lines <- readLines(
+    "DSBench/data_analysis/data.json",
+    warn = FALSE
+  )
 
   metadata_json <- list()
   for (line in metadata_lines) {
@@ -82,7 +85,7 @@ create_dseval_dataset <- function() {
   res
 }
 
-dseval_raw <- create_dseval_dataset()
+dseval_raw <- create_analysis_dataset()
 
 dseval_d <- tidyr::unnest(dseval_raw, input)
 
@@ -150,6 +153,6 @@ d <- tidyr::nest(d, input = c(question, dir))
 d <- tidyr::unnest(d, metadata)
 d <- dplyr::nest_by(d, id, input, target, .key = "metadata")
 
-dseval_dataset <- dplyr::ungroup(d)
+analysis_dataset <- dplyr::ungroup(d)
 
-usethis::use_data(dseval_dataset, overwrite = TRUE)
+usethis::use_data(analysis_dataset, overwrite = TRUE)

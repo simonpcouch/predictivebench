@@ -1,10 +1,41 @@
-#' dseval solver
+#' Data analysis benchmark
+#'
+#' @description
+#' Objects prefixed with `analysis_` correspond to the data analysis benchmark in
+#' dseval.
+#'
+#' * `da_dataset` is the dataset underlying the eval.
+#' * `da_solver` is the solver, which just prompts the provided chat with the
+#' instruction and working directory provided in `da_dataset$input` and
+#' allows the model to "converse" with a mock analyst—an LLM instance that
+#' just gently prods the model along without providing any specific guidance.
+#' * The scorer for the data analysis task is [vitals::model_graded_qa()].
+#' * `da_task` combines the dataset, solver, and scorer into a [vitals::Task].
+#'
+#'
+#' @examples
+#' analysis_dataset
+#'
+#' tsk <- analysis_task()
+#' tsk
+#'
+#' tsk$eval(solver_chat = databot:::chat_bot())
+#'
+#' @name analysis
+#' @aliases dseval
+
+# dataset ----------------------------------------------------------------------
+#' @rdname analysis
+"analysis_dataset"
+
+# solver -----------------------------------------------------------------------
+#' @rdname analysis
 #' @export
-dseval_solver <- function(solver_chat = NULL) {
+analysis_solver <- function(solver_chat = NULL) {
   chat <- solver_chat
   function(inputs, ..., solver_chat = chat) {
     ch <- solver_chat$clone()
-    res <- lapply(inputs, dseval_solve_one, chat = ch)
+    res <- lapply(inputs, analysis_solve_one, chat = ch)
     list(
       result = purrr::map(res, function(c) {
         if (inherits(c, "Chat")) c$last_turn()@text else c
@@ -14,7 +45,7 @@ dseval_solver <- function(solver_chat = NULL) {
   }
 }
 
-dseval_solve_one <- function(input, chat) {
+analysis_solve_one <- function(input, chat) {
   dir <- input$dir
   instruction <- input$question
 
@@ -87,4 +118,18 @@ prepare_directory <- function(dir) {
   fs::file_copy(files, ".vitals/solver")
 
   ".vitals/solver"
+}
+
+# task -------------------------------------------------------------------------
+#' @rdname analysis
+#' @export
+analysis_task <- function(epochs = 1, dir = ".vitals/logs/") {
+  vitals::Task$new(
+    dataset = analysis_dataset[1:3, ],
+    solver = analysis_solver(),
+    scorer = vitals::model_graded_qa(),
+    epochs = epochs,
+    name = "dseval",
+    dir = dir
+  )
 }
