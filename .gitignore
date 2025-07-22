@@ -8,5 +8,7 @@
 .quarto
 # This is https://drive.google.com/file/d/12pIOJqOSsDBz0eNpq0bjwkLJ8h4HAECB/view?usp=sharing
 DSBench/data_analysis/data/
-# Just omitting for now to focus on the data analysis portion
-DSBench/data_modeling
+# This is https://drive.google.com/file/d/1aH5HHnbKxO9Qq0A4d9MUOKmBj8KwU9Pe/view?usp-sharing
+DSBench/data_modeling/data/
+
+*.zip
