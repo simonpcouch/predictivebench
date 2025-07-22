@@ -22,13 +22,13 @@ analysis_task(epochs = 1, dir = ".vitals/logs/")
 Objects prefixed with \code{analysis_} correspond to the data analysis benchmark in
 dseval.
 \itemize{
-\item \code{da_dataset} is the dataset underlying the eval.
-\item \code{da_solver} is the solver, which just prompts the provided chat with the
-instruction and working directory provided in \code{da_dataset$input} and
+\item \code{analysis_dataset} is the dataset underlying the eval.
+\item \code{analysis_solver} is the solver, which just prompts the provided chat with the
+instruction and working directory provided in \code{analysis_dataset$input} and
 allows the model to "converse" with a mock analyst—an LLM instance that
 just gently prods the model along without providing any specific guidance.
 \item The scorer for the data analysis task is \code{\link[vitals:scorer_model]{vitals::model_graded_qa()}}.
-\item \code{da_task} combines the dataset, solver, and scorer into a \link[vitals:Task]{vitals::Task}.
+\item \code{analysis_task} combines the dataset, solver, and scorer into a \link[vitals:Task]{vitals::Task}.
 }
 }
 \examples{

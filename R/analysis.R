@@ -4,13 +4,13 @@
 #' Objects prefixed with `analysis_` correspond to the data analysis benchmark in
 #' dseval.
 #'
-#' * `da_dataset` is the dataset underlying the eval.
-#' * `da_solver` is the solver, which just prompts the provided chat with the
-#' instruction and working directory provided in `da_dataset$input` and
+#' * `analysis_dataset` is the dataset underlying the eval.
+#' * `analysis_solver` is the solver, which just prompts the provided chat with the
+#' instruction and working directory provided in `analysis_dataset$input` and
 #' allows the model to "converse" with a mock analyst—an LLM instance that
 #' just gently prods the model along without providing any specific guidance.
 #' * The scorer for the data analysis task is [vitals::model_graded_qa()].
-#' * `da_task` combines the dataset, solver, and scorer into a [vitals::Task].
+#' * `analysis_task` combines the dataset, solver, and scorer into a [vitals::Task].
 #'
 #'
 #' @examples
