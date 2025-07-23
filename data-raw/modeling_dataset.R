@@ -174,6 +174,29 @@ best_scores <- get_all_kaggle_best_scores()
 targets <- best_scores
 targets <- setNames(targets$best_score, targets$name)
 
+# targets ----------------------------------------------------------------------
+# target error metrics are in save_performance/baseline
+baseline_files <-
+  list.files(
+    "DSBench/data_modeling/save_performance/baseline",
+    full.names = TRUE
+  )
+
+baselines <- list()
+for (file in baseline_files) {
+  baselines[[gsub(".txt", "", basename(file))]] <- as.numeric(readLines(
+    file.path(file, "result.txt"),
+    warn = FALSE
+  ))
+}
+
+baselines <- baselines[basename(introduction_basenames_kept)]
+
+introduction_basenames_kept <- introduction_basenames_kept[
+  basename(introduction_basenames_kept) %in% names(baselines)
+]
+
+
 # putting it all together ------------------------------------------------------
 splits_paths <- file.path(
   "DSBench/data_modeling/data/data_resplit",
@@ -196,6 +219,7 @@ modeling_dataset <-
     id = basename(introduction_basenames_kept),
     input = unname(inputs),
     target = unlist(targets[basename(introduction_basenames_kept)]),
+    baseline = unlist(baselines[basename(introduction_basenames_kept)]),
     metric_name = unlist(metrics)[basename(introduction_basenames_kept)]
   )
 
