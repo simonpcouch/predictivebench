@@ -2,3 +2,6 @@
 
 export(analysis_solver)
 export(analysis_task)
+export(modeling_scorer)
+export(modeling_solver)
+export(modeling_task)

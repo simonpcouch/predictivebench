@@ -8,3 +8,5 @@ DSBench/
 ^[.]?air[.]toml$
 ^\.vscode$
 ^data-raw$
+
+inst/data-raw/

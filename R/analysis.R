@@ -92,7 +92,7 @@ prepare_analysis_directory <- function(dir) {
 # task -------------------------------------------------------------------------
 #' @rdname analysis
 #' @export
-analysis_task <- function(epochs = 1, dir = ".vitals/logs/") {
+analysis_task <- function(epochs = 1, dir = ".vitals/logs/analysis/") {
   vitals::Task$new(
     dataset = analysis_dataset[1:3, ],
     solver = analysis_solver(),

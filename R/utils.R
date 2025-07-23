@@ -15,15 +15,15 @@ mock_analyst <- function() {
 
 converse <- function(assistant, instruction, analyst = mock_analyst()) {
   assistant_response <- assistant$chat("Hello!", echo = FALSE)
-  assistant_response <- assistant$chat(instruction)
+  assistant_response <- assistant$chat(instruction, echo = FALSE)
   analyst$set_turns(list(
     ellmer::Turn("user", instruction),
     ellmer::Turn("assistant", assistant$last_turn()@text)
   ))
 
   while (!grepl("ANSWER:", assistant_response)) {
-    analyst_response <- analyst$chat(assistant_response)
-    assistant_response <- assistant$chat(analyst_response)
+    analyst_response <- analyst$chat(assistant_response, echo = FALSE)
+    assistant_response <- assistant$chat(analyst_response, echo = FALSE)
   }
 
   assistant

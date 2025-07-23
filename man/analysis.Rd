@@ -16,7 +16,7 @@ analysis_dataset
 
 analysis_solver(solver_chat = NULL)
 
-analysis_task(epochs = 1, dir = ".vitals/logs/")
+analysis_task(epochs = 1, dir = ".vitals/logs/analysis/")
 }
 \description{
 Objects prefixed with \code{analysis_} correspond to the data analysis benchmark in

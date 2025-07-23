@@ -127,49 +127,50 @@ introduction_basenames_kept <- introduction_basenames_kept[
 # target error metrics are not included in the source repository, and they
 # report being able to reproduce only 22 of them. instead, we can grab the error
 # metric of the winning kaggle submission (as of July 22, 2025) on the test data.
-get_kaggle_best_score <- function(competition_url) {
-  cat(competition_url)
-  cat("\n")
-  comp_name <- basename(competition_url)
-  leaderboard_url <- paste0(competition_url, "/leaderboard")
+# get_kaggle_best_score <- function(competition_url) {
+#   cat(competition_url)
+#   cat("\n")
+#   comp_name <- basename(competition_url)
+#   leaderboard_url <- paste0(competition_url, "/leaderboard")
+#
+#   b <- chromote::ChromoteSession$new()
+#
+#   b$go_to(leaderboard_url)
+#
+#   Sys.sleep(2)
+#
+#   js_code <- '
+#   var allElements = document.querySelectorAll("*");
+#   var scores = [];
+#   for (var i = 0; i < allElements.length; i++) {
+#     var text = allElements[i].innerText;
+#     if (text && /^[0-9]+\\.?[0-9]*$/.test(text.trim())) {
+#       scores.push(text.trim());
+#     }
+#   }
+#   scores.length >= 2 ? scores[1] : null;
+#   '
+#
+#   score_result <- b$Runtime$evaluate(js_code, returnByValue = TRUE)
+#   b$close()
+#
+#   as.numeric(score_result$result$value)
+# }
+#
+# get_all_kaggle_best_scores <- function(
+#   data_json_path = "DSBench/data_modeling/data.json"
+# ) {
+#   competition_lines <- readLines(data_json_path)
+#   competitions <- lapply(competition_lines, jsonlite::fromJSON)
+#   competitions <- do.call(rbind, lapply(competitions, as.data.frame))
+#
+#   competitions$best_score <- sapply(competitions$url, get_kaggle_best_score)
+#
+#   competitions
+# }
 
-  b <- chromote::ChromoteSession$new()
-
-  b$go_to(leaderboard_url)
-
-  Sys.sleep(2)
-
-  js_code <- '
-  var allElements = document.querySelectorAll("*");
-  var scores = [];
-  for (var i = 0; i < allElements.length; i++) {
-    var text = allElements[i].innerText;
-    if (text && /^[0-9]+\\.?[0-9]*$/.test(text.trim())) {
-      scores.push(text.trim());
-    }
-  }
-  scores.length >= 2 ? scores[1] : null;
-  '
-
-  score_result <- b$Runtime$evaluate(js_code, returnByValue = TRUE)
-  b$close()
-
-  as.numeric(score_result$result$value)
-}
-
-get_all_kaggle_best_scores <- function(
-  data_json_path = "DSBench/data_modeling/data.json"
-) {
-  competition_lines <- readLines(data_json_path)
-  competitions <- lapply(competition_lines, jsonlite::fromJSON)
-  competitions <- do.call(rbind, lapply(competitions, as.data.frame))
-
-  competitions$best_score <- sapply(competitions$url, get_kaggle_best_score)
-
-  competitions
-}
-
-best_scores <- get_all_kaggle_best_scores()
+#best_scores <- get_all_kaggle_best_scores()
+load(system.file("data-raw/best_scores.rda", package = "dseval"))
 
 targets <- best_scores
 targets <- setNames(targets$best_score, targets$name)
@@ -206,10 +207,10 @@ splits_paths <- file.path(
 inputs <- list()
 for (i in seq_along(introduction_basenames_kept)) {
   inputs[[i]] <- list(
-    question = introductions_rewritten,
+    question = introductions_rewritten[[i]],
     dir = file.path(
       "DSBench/data_modeling/data/data_resplit",
-      introduction_basenames_kept[i]
+      basename(introduction_basenames_kept[i])
     )
   )
 }
