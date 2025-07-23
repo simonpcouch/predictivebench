@@ -179,7 +179,7 @@ relative_performance_gap <- function(scores) {
 #' @export
 modeling_task <- function(epochs = 1, dir = ".vitals/logs/modeling/") {
   vitals::Task$new(
-    dataset = modeling_dataset[1, ],
+    dataset = modeling_dataset[3, ],
     solver = modeling_solver(),
     scorer = modeling_scorer,
     metrics = list(relative_performance_gap = relative_performance_gap),
