@@ -13,7 +13,15 @@ mock_analyst <- function() {
   )
 }
 
-converse <- function(assistant, instruction, analyst = mock_analyst()) {
+converse <- function(
+  assistant,
+  instruction,
+  analyst = mock_analyst(),
+  keyword,
+  hook = function(chat) {
+    FALSE
+  }
+) {
   assistant_response <- assistant$chat("Hello!", echo = FALSE)
   assistant_response <- assistant$chat(instruction, echo = FALSE)
   analyst$set_turns(list(
@@ -21,7 +29,7 @@ converse <- function(assistant, instruction, analyst = mock_analyst()) {
     ellmer::Turn("assistant", assistant$last_turn()@text)
   ))
 
-  while (!grepl("ANSWER:", assistant_response)) {
+  while (!grepl(keyword, assistant_response) || hook(assistant)) {
     analyst_response <- analyst$chat(assistant_response, echo = FALSE)
     assistant_response <- assistant$chat(analyst_response, echo = FALSE)
   }

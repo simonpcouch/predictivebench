@@ -80,7 +80,12 @@ modeling_solve_one <- function(input, chat) {
     collapse = "\n"
   ))
 
-  res <- converse(assistant, instruction = instruction)
+  res <- converse(
+    assistant,
+    instruction = instruction,
+    keyword = "[SUBMITTED]",
+    hook = has_not_submitted()
+  )
 
   list(chat = res, submission = read_submission())
 }
@@ -104,6 +109,15 @@ read_submission <- function() {
       "The model failed to present a submission."
     }
   )
+}
+
+# return TRUE while the assistant should keep going
+has_not_submitted <- function() {
+  counter <- 0
+  function(...) {
+    counter <<- counter + 1
+    !file.exists("submission.csv") && counter < 100
+  }
 }
 
 # scorer -----------------------------------------------------------------------
@@ -131,28 +145,42 @@ read_submission <- function() {
 #'
 #' @rdname modeling
 #' @export
-modeling_scorer <- function(samples) {
+modeling_scorer <- function(samples, ...) {
   samples$metric <- purrr::pmap(samples, calculate_metric)
   samples$directions <- purrr::map(samples$metric_name, get_metric_direction)
-  res <- samples[c("result", "target", "baseline", "directions")]
+  res <- samples[c("metric", "target", "baseline", "directions")]
   names(res) <- c("observed", "best", "baseline", "direction")
 
   list(
-    score = purrr::pmap(res, relative_performance_gap),
+    score = purrr::pmap_dbl(res, relative_performance_gap_i),
     scorer_metadata = list(metric = samples$metric)
   )
 }
 
+# TODO: this won't work for classification
 calculate_metric <- function(...) {
   dots <- list(...)
-  submission <- dots$solver_metadata$submission
-  metric_fn <- getFromNamespace(sample$metric_name, "yardstick")
-  metric_fn(submission)
+
+  submission <- dots$solver_metadata
+  # TODO: this should actually live in the eval itself / in inst
+
+  truth_path <- file.path(
+    "DSBench/data_modeling/data/answers",
+    basename(dots$input$dir),
+    "test_answer.csv"
+  )
+  truth <- read.csv(truth_path)
+  in_common <- colnames(truth)[colnames(truth) %in% colnames(submission)]
+  outcome_name <- colnames(truth)[!colnames(truth) %in% in_common]
+  pred_names <- colnames(submission)[!colnames(submission) %in% in_common]
+  result <- dplyr::left_join(truth, submission, by = in_common)
+  metric_fn <- getFromNamespace(dots$metric_name, "yardstick")
+  metric_fn(result, truth = outcome_name, estimate = pred_names)$.estimate
 }
 
 get_metric_direction <- function(metric_name) {
   metric_fn <- getFromNamespace(metric_name, "yardstick")
-  attr(metric_n, "direction")
+  attr(metric_fn, "direction")
 }
 
 # observed, best, and baseline are error metric values.
