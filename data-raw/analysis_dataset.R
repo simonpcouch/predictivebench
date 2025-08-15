@@ -149,8 +149,65 @@ res <- parallel_chat_structured(
 d <- dplyr::bind_cols(dseval_d[!names(dseval_d) %in% names(res)], res)
 d <- dplyr::mutate(d, question = paste(introduction, question, sep = "\n\n"))
 d <- dplyr::select(d, -c(introduction))
-d <- tidyr::nest(d, input = c(question, dir))
-d <- tidyr::unnest(d, metadata)
+
+# save(d, file = "inst/data-raw/d_pre_split.rda")
+
+# Now, we want to pare back the initial questions. At the moment, the initial
+# questions are quite long; all of the information needed to answer the question
+# is inside of the first prompt. This is unlike what a real data science would
+# likely actually see in practice; in practice, an agent might get a few sentences
+# of prompting, and otherwise will need to elicit information from the user.
+#
+# We can use the "mock analyst" to help solve this problem; the current initial
+# question will be split up into two pieces; `question` is the initial prompt
+# that is actually provided to the solver model, `knowledge` is information that
+# the mock analyst has access to that it will freely give to the solver model
+# if the model asks for it. In this way:
+#
+# * It's less of an issue if the eval "leaks" into the training data as the
+#   thing the solver model initially sees is a couple sentences identifying a
+#   problem at a high level.
+# * Interactions look more like "real" data science when an analyst uses an AI
+#   assistant.
+split_prompts <- glue::glue_data(
+  d,
+  "
+Here's a data analysis question that currently contains all the information needed to solve it:
+
+QUESTION:\n {question}\n\n
+
+Please split this into two parts:
+
+1. question: A brief initial prompt (3-4 sentences) that an analyst might write in first person when asking an AI assistant for help with a data analysis problem. This should identify the high-level problem but not contain all the detailed information needed to solve it. The most pertinent
+part of the question is usually towards the end of the introduction; include
+that as well as a few additional pieces of context.
+
+2. knowledge: The remaining detailed information, context, and specifics that the analyst has access to and can provide if the AI assistant asks follow-up questions. This should be organized into natural buckets of information (e.g., assumptions, factual context, data descriptions, constraints, etc.) with each bucket as a separate string in an array. Those buckets will likely be outlined already in the original question; if so, just use those.
+
+The question should sound like a typical analyst might have written it when initially approaching an AI assistant for help.
+"
+)
+
+ch_split <- chat_anthropic(model = "claude-sonnet-4-20250514")
+split_res <- parallel_chat_structured(
+  ch_split,
+  as.list(split_prompts),
+  type_object(
+    question = type_string(
+      description = "A brief initial prompt (3-4 sentences) in first person that an analyst might write when asking an AI assistant for help with a data analysis problem."
+    ),
+    knowledge = type_array(
+      type_string(),
+      description = "An array of strings, each containing a natural bucket of information (e.g., assumptions, factual context, data descriptions, constraints, etc.). Those buckets will likely be outlined already in the original question; if so, just use those."
+    )
+  )
+)
+
+# save(split_res, file = "inst/data-raw/split_res.rda")
+
+d <- dplyr::bind_cols(d[!names(d) %in% names(split_res)], split_res)
+
+d <- tidyr::nest(d, input = c(question, knowledge, dir))
 d <- dplyr::nest_by(d, id, input, target, .key = "metadata")
 
 analysis_dataset <- dplyr::ungroup(d)
