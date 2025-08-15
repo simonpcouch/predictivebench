@@ -49,7 +49,7 @@ introductions <- purrr::map(
 # currently, these introductions include quite a bit of extraneous information,
 # "This is a Kaggle Competition" soft openings, and Acknowledgements. We'd
 # like to rephrase them to be concise and direct.
-introductions_rewritten <- introductions
+# (Note: no actual rewriting implemented yet, using original introductions)
 
 # metric names ----------------------------------------------------------------
 # the names of the metrics corresponding to the targets are in
@@ -197,6 +197,14 @@ introduction_basenames_kept <- introduction_basenames_kept[
   basename(introduction_basenames_kept) %in% names(baselines)
 ]
 
+# reorder introductions to match final introduction_basenames_kept
+original_order <- gsub(".txt", "", introduction_files_kept)
+reorder_indices <- match(
+  basename(introduction_basenames_kept),
+  basename(original_order)
+)
+introductions <- introductions[reorder_indices]
+
 
 # putting it all together ------------------------------------------------------
 splits_paths <- file.path(
@@ -207,7 +215,7 @@ splits_paths <- file.path(
 inputs <- list()
 for (i in seq_along(introduction_basenames_kept)) {
   inputs[[i]] <- tibble::tibble(
-    question = list(introductions_rewritten[[i]]),
+    question = list(introductions[[i]]),
     dir = file.path(
       "DSBench/data_modeling/data/data_resplit",
       basename(introduction_basenames_kept[i])
@@ -221,7 +229,7 @@ modeling_d <-
     input = unname(inputs),
     target = unlist(targets[basename(introduction_basenames_kept)]),
     baseline = unlist(baselines[basename(introduction_basenames_kept)]),
-    metric_name = unlist(metrics)[basename(introduction_basenames_kept)]
+    metric_name = unlist(metrics[basename(introduction_basenames_kept)])
   )
 
 # store the results of the deterministic processing before rephrasing via LLMs
@@ -263,6 +271,8 @@ split_res <- parallel_chat_structured(
     )
   )
 )
+
+save(split_res, file = "inst/data-raw/split_res_modeling.rda")
 
 modeling_dataset <- dplyr::bind_cols(
   modeling_dataset[!names(modeling_dataset) %in% names(split_res)],
