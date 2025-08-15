@@ -1,36 +1,36 @@
-#' Data analysis benchmark
-#'
-#' @description
-#' Objects prefixed with `analysis_` correspond to the data analysis benchmark in
-#' dseval.
-#'
-#' * `analysis_dataset` is the dataset underlying the eval.
-#' * `analysis_solver` is the solver, which just prompts the provided chat with the
-#' instruction and working directory provided in `analysis_dataset$input` and
-#' allows the model to "converse" with a mock analyst—an LLM instance that
-#' just gently prods the model along without providing any specific guidance.
-#' * The scorer for the data analysis task is [vitals::model_graded_qa()].
-#' * `analysis_task` combines the dataset, solver, and scorer into a [vitals::Task].
-#'
-#'
-#' @examples
-#' analysis_dataset
-#'
-#' tsk <- analysis_task()
-#' tsk
-#'
-#' tsk$eval(solver_chat = databot:::chat_bot())
-#'
-#' @name analysis
-#' @aliases dseval
+# Data analysis benchmark
+#
+# @description
+# Objects prefixed with `analysis_` correspond to the data analysis benchmark in
+# dseval.
+#
+# * `analysis_dataset` is the dataset underlying the eval.
+# * `analysis_solver` is the solver, which just prompts the provided chat with the
+# instruction and working directory provided in `analysis_dataset$input` and
+# allows the model to "converse" with a mock analyst—an LLM instance that
+# just gently prods the model along without providing any specific guidance.
+# * The scorer for the data analysis task is [vitals::model_graded_qa()].
+# * `analysis_task` combines the dataset, solver, and scorer into a [vitals::Task].
+#
+#
+# @examples
+# analysis_dataset
+#
+# tsk <- analysis_task()
+# tsk
+#
+# tsk$eval(solver_chat = databot:::chat_bot())
+#
+# @name analysis
+# @aliases dseval
 
 # dataset ----------------------------------------------------------------------
-#' @rdname analysis
+# @rdname analysis
 "analysis_dataset"
 
 # solver -----------------------------------------------------------------------
-#' @rdname analysis
-#' @export
+# @rdname analysis
+# @export
 analysis_solver <- function(solver_chat = NULL) {
   chat <- solver_chat
   function(inputs, ..., solver_chat = chat) {
@@ -90,8 +90,8 @@ prepare_analysis_directory <- function(dir) {
 }
 
 # task -------------------------------------------------------------------------
-#' @rdname analysis
-#' @export
+# @rdname analysis
+# @export
 analysis_task <- function(epochs = 1, dir = ".vitals/logs/analysis/") {
   vitals::Task$new(
     dataset = analysis_dataset[1:3, ],

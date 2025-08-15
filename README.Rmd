@@ -22,12 +22,15 @@ knitr::opts_chunk$set(
 
 This repository implements an adaptation of [DSBench](https://arxiv.org/abs/2409.07703), a data science LLM evaluation, in R using [vitals](https://vitals.tidyverse.org/).
 
-The original benchmark contains 466 data analysis questions. This implementation of the benchmark diverges from the original in a few ways:
+This implementation of the benchmark diverges from the original in a few ways:
 
-* In DSBench, each question has a multiple choice answer. This is an issue: very seldomly in real life do data science tasks end with a multiple choice answer. Also, this increases the risk of sandbagging, where models will realize they’re being evaluated and their behavior might change as a result. dseval rephrases questions to have open-ended answers.
-* In DSBench, the .xslx, .csv, and other source files are inlined into the user prompt. In dseval, models are situated in a working directory where those files exist.
-* File names and references are renamed to be less indicative of competition data science / model evaluations, also to descrease the risk of sandbagging.
-* Rather than requiring the agent to complete the task in one fell swoop, the agent is allowed to ask a user questions. That "user" is actually a "model-in-the-middle", instructed to generally provide a thumbs-up and little guidance.
+* dseval implements only the data modeling section of DSBench.
+* In DSBench, the .xslx, .csv, and other source files are inlined into the user prompt. In dseval, models are situated in a working directory where those files exist and must call tools to read them.
+* File names and references are renamed to be less indicative of competition data science / model evaluations. This decreases the risk of sandbagging, where models will realize they’re being evaluated and their behavior might change as a result. 
+* Rather than requiring the agent to complete the task in one fell swoop, the agent is allowed to ask a "user" questions (and _must_ do so to perform very well on the eval). This allows for a number of advantages:
+  * In many real-world agent use cases, the agent interacts with the user regularly. It's possible that agents may behave differently when acting completely independently versus in tandem with a user.
+  * Seldomly in real-world data science would a model be provided with all of the necessary information to complete a task in its initial prompt. Instead, rather than providing the full description of a data science competition and all of the necessary context needed to complete it in the first prompt, the agent is provided with a much more sparse (3-4 sentence) description of the problem and must elicit information from the user.
+  * The rest of the needed context lives with a "user" that is actually an LLM itself. This mock user has access to a knowledge bank for the specific question with some relevant information for the question, and is instructed to provide information from the bank if asked for it. Otherwise, it will passively nudge the model along when asked for input.
 
 > IMPORTANT
 >
@@ -39,13 +42,27 @@ The original benchmark contains 466 data analysis questions. This implementation
 library(tibble)
 library(dseval)
 
-analysis_dataset
+modeling_dataset
 ```
+
+Here's an example question:
+
+```{r}
+cat(modeling_dataset$input[[1]]$question)
+```
+
+The mock user, in this question, would have access to the following information that it can provide to the agent as requested:
+
+```{r}
+cat(modeling_dataset$input[[1]]$knowledge)
+```
+
+Run the task like so:
 
 ```{r}
 #| eval: false
-tsk <- analysis_task()
+tsk <- modeling_task()
 tsk
 
-tsk$eval(solver_chat = databot:::chat_bot())
+tsk$eval(solver_chat = predictive:::predictive_client())
 ```
