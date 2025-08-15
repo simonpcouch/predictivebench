@@ -22,11 +22,11 @@ converse <- function(
     FALSE
   }
 ) {
-  assistant_response <- assistant$chat("Hello!", echo = FALSE)
+  assistant_response_initial <- assistant$chat("Hello!", echo = FALSE)
   assistant_response <- assistant$chat(question, echo = FALSE)
   analyst$set_turns(list(
-    ellmer::Turn("user", question),
-    ellmer::Turn("assistant", assistant$last_turn()@text)
+    ellmer::Turn("user", assistant_response_initial),
+    ellmer::Turn("assistant", question)
   ))
 
   while (!grepl(keyword, assistant_response) || hook(assistant)) {

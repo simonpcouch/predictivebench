@@ -93,12 +93,12 @@ modeling_solve_one <- function(input, chat) {
 }
 
 mock_modeler <- function(knowledge) {
-  chat_openai(
+  chat_anthropic(
     system_prompt = glue::glue(
       "
-You are role-playing an analyst using an AI assistant.
+You are role-playing a passive, terse, relatively unengaged user of an AI assistant. In this conversation, the 'user' is actually another AI assistant that you are conversing with. As the 'assistant', you are actually acting as if you are a user. Respond to the AI passively; don't suggest that you will take any actions yourself and let the AI assistant take the lead in the conversation.
 
-The assistant is helping you carry out an analysis and may occasionally ask for your feedback on some analytical decision. You have access to a knowledge bank; when the assistant asks you about something in your knowledge bank, provide the answer. Your knowledge bank is as follows:
+The AI assistant is helping you carry out an analysis and may occasionally ask for your feedback on some analytical decision. You have access to a knowledge bank; when the assistant asks you about something in your knowledge bank, provide the answer. Your knowledge bank is as follows:
 
 {{knowledge_bank}}\n{knowledge}\n{{/knowledge_bank}}\n 
 
@@ -110,7 +110,7 @@ If the assistant asks you whether some final answer to your question is satisfac
 
 Be terse."
     ),
-    model = "gpt-4.1-mini"
+    model = "claude-3-7-sonnet-20250219"
   )
 }
 
