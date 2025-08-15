@@ -206,8 +206,8 @@ splits_paths <- file.path(
 
 inputs <- list()
 for (i in seq_along(introduction_basenames_kept)) {
-  inputs[[i]] <- list(
-    question = introductions_rewritten[[i]],
+  inputs[[i]] <- tibble::tibble(
+    question = list(introductions_rewritten[[i]]),
     dir = file.path(
       "DSBench/data_modeling/data/data_resplit",
       basename(introduction_basenames_kept[i])
