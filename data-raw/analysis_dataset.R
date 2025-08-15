@@ -16,7 +16,7 @@ format_input <- function(input) {
   competition <- competition_question[1]
   question <- competition_question[2]
 
-  competition_dir <- file.path("DSBench", "data", competition)
+  competition_dir <- file.path("DSBench", "data_analysis", "data", competition)
   competition_introduction <- readLines(
     file.path(
       competition_dir,
@@ -87,7 +87,11 @@ create_analysis_dataset <- function() {
 
 dseval_raw <- create_analysis_dataset()
 
-dseval_d <- tidyr::unnest(dseval_raw, input)
+# This competition seems to be mostly be asking about understanding of
+# some set of business concepts; more about raw knowledge than analysis.
+dseval_d <- filter(dseval_raw, competition_id == "00000002")
+
+dseval_d <- tidyr::unnest(dseval_d, input)
 
 # Now, we have:
 # * target: The multiple choice corresponding to the correct answer
