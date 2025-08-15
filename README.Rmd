@@ -39,12 +39,12 @@ The original benchmark contains 466 data analysis questions. This implementation
 library(tibble)
 library(dseval)
 
-dseval_dataset
+analysis_dataset
 ```
 
 ```{r}
 #| eval: false
-tsk <- dseval_task()
+tsk <- analysis_task()
 tsk
 
 tsk$eval(solver_chat = databot:::chat_bot())
