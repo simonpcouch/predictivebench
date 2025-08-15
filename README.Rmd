@@ -39,6 +39,15 @@ This implementation of the benchmark diverges from the original in a few ways:
 # Example
 
 ```{r}
+#| include: false
+cat <- function(x, width = 0.9 * getOption("width")) {
+  lines <- unlist(strsplit(x, "\n"))
+  wrapped <- unlist(lapply(lines, strwrap, width = width))
+  base::cat(wrapped, sep = "\n")
+}
+```
+
+```{r}
 library(tibble)
 library(dseval)
 

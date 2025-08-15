@@ -79,7 +79,14 @@ Here’s an example question:
 
 ``` r
 cat(modeling_dataset$input[[1]]$question)
-#> I have a dataset called `train` in my current working directory that contains only categorical features, and I need to build a model to predict the probability of a binary target. The features include binary variables, nominal variables with different cardinalities, ordinal variables, and some potentially cyclical features like day and month. I'm looking to optimize my model based on area under the ROC curve - can you help me get started with encoding these categorical variables effectively?
+#> I have a dataset called `train` in my current working directory that
+#> contains only categorical features, and I need to build a model to
+#> predict the probability of a binary target. The features include binary
+#> variables, nominal variables with different cardinalities, ordinal
+#> variables, and some potentially cyclical features like day and month.
+#> I'm looking to optimize my model based on area under the ROC curve -
+#> can you help me get started with encoding these categorical variables
+#> effectively?
 ```
 
 The mock user, in this question, would have access to the following
@@ -87,7 +94,20 @@ information that it can provide to the agent as requested:
 
 ``` r
 cat(modeling_dataset$input[[1]]$knowledge)
-#> The dataset contains exclusively categorical features with the following types: binary features (bin_*), low- and high-cardinality nominal features (nom_*), low- and high-cardinality ordinal features (ord_*), and potentially cyclical features including day (of the week) and month. The string ordinal features ord_3, ord_4, and ord_5 are lexically ordered according to string.ascii_letters. The target variable is binary and requires probability predictions between 0 and 1. The dataset includes missing values and feature interactions, adding complexity to the encoding task. Files include train.csv (training set), test.csv (test set for predictions), and sample_submission.csv (example submission format). Submissions should be evaluated on area under the ROC curve between predicted probabilities and observed targets. The submission format requires id and target columns, where target represents the predicted probability for each test case.
+#> The dataset contains exclusively categorical features with the
+#> following types: binary features (bin_*), low- and high-cardinality
+#> nominal features (nom_*), low- and high-cardinality ordinal features
+#> (ord_*), and potentially cyclical features including day (of the week)
+#> and month. The string ordinal features ord_3, ord_4, and ord_5 are
+#> lexically ordered according to string.ascii_letters. The target
+#> variable is binary and requires probability predictions between 0 and
+#> 1. The dataset includes missing values and feature interactions, adding
+#> complexity to the encoding task. Files include train.csv (training
+#> set), test.csv (test set for predictions), and sample_submission.csv
+#> (example submission format). Submissions should be evaluated on area
+#> under the ROC curve between predicted probabilities and observed
+#> targets. The submission format requires id and target columns, where
+#> target represents the predicted probability for each test case.
 ```
 
 Run the task like so:
