@@ -15,7 +15,7 @@ mock_analyst <- function() {
 
 converse <- function(
   assistant,
-  instruction,
+  question,
   analyst = mock_analyst(),
   keyword,
   hook = function(chat) {
@@ -23,9 +23,9 @@ converse <- function(
   }
 ) {
   assistant_response <- assistant$chat("Hello!", echo = FALSE)
-  assistant_response <- assistant$chat(instruction, echo = FALSE)
+  assistant_response <- assistant$chat(question, echo = FALSE)
   analyst$set_turns(list(
-    ellmer::Turn("user", instruction),
+    ellmer::Turn("user", question),
     ellmer::Turn("assistant", assistant$last_turn()@text)
   ))
 

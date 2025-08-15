@@ -62,7 +62,7 @@ analysis_solve_one <- function(input, chat) {
     "At some point in the conversation, once you've answered the question, you should notify the user that you have come to an answer with the keyword 'ANSWER: ' followed by your answer. Be sure to ask the user whether it's fine to submit an answer before you do so. Make sure to include the keyword in all caps, followed by a colon, as written."
   ))
 
-  res <- converse(assistant, instruction = instruction, keyword = "ANSWER:")
+  res <- converse(assistant, question = instruction, keyword = "ANSWER:")
 
   res
 }

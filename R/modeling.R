@@ -58,7 +58,8 @@ modeling_solver <- function(solver_chat = NULL) {
 
 modeling_solve_one <- function(input, chat) {
   dir <- input$dir
-  instruction <- input$question
+  question <- input$question
+  knowledge <- input$knowledge
 
   dir_prepped <- prepare_modeling_directory(dir)
   withr::defer(unlink(dir_prepped, recursive = TRUE))
@@ -82,12 +83,35 @@ modeling_solve_one <- function(input, chat) {
 
   res <- converse(
     assistant,
-    instruction = instruction,
+    question = question,
+    analyst = mock_modeler(knowledge),
     keyword = "[SUBMITTED]",
     hook = has_not_submitted()
   )
 
   list(chat = res, submission = read_submission())
+}
+
+mock_modeler <- function(knowledge) {
+  chat_openai(
+    system_prompt = glue::glue(
+      "
+You are role-playing an analyst using an AI assistant.
+
+The assistant is helping you carry out an analysis and may occasionally ask for your feedback on some analytical decision. You have access to a knowledge bank; when the assistant asks you about something in your knowledge bank, provide the answer. Your knowledge bank is as follows:
+
+{{knowledge_bank}}\n{knowledge}\n{{/knowledge_bank}}\n 
+
+If the assistant just checks in to get your thumbs-up on some decision, you might say 'Sounds good.' or something of the like.
+
+If the assistant asks you an open-ended question that isn't in your knowledge bank, just ask the assistant to use its best judgment.
+
+If the assistant asks you whether some final answer to your question is satisfactory, affirm it and tell it to move forward in submitting the solution.
+
+Be terse."
+    ),
+    model = "gpt-4.1-mini"
+  )
 }
 
 # makes a directory that only has the files for analysis inside of it
@@ -171,7 +195,7 @@ calculate_metric <- function(...) {
   )
   truth <- read.csv(truth_path)
   in_common <- colnames(truth)[colnames(truth) %in% colnames(submission)]
-  outcome_name <- colnames(truth)[!colnames(truth) %in% in_common]
+  outcome_name <- colnames(truth)[!colnames(truth) %in% c(in_common, "id")]
   pred_names <- colnames(submission)[!colnames(submission) %in% in_common]
   result <- dplyr::left_join(truth, submission, by = in_common)
   metric_fn <- getFromNamespace(dots$metric_name, "yardstick")
