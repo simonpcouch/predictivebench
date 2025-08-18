@@ -284,4 +284,115 @@ modeling_dataset <- modeling_dataset %>%
 
 modeling_dataset <- dplyr::relocate(modeling_dataset, input, .after = id)
 
+# calculate deterministic baselines using tidymodels null_model() (#8) ---------
+library(tidymodels)
+library(yardstick)
+
+calculate_null_baseline <- function(id, metric_name) {
+  train_path <- file.path(
+    "DSBench/data_modeling/data/data_resplit",
+    id,
+    "train.csv"
+  )
+  test_path <- file.path(
+    "DSBench/data_modeling/data/answers",
+    id,
+    "test_answer.csv"
+  )
+
+  if (!file.exists(train_path) || !file.exists(test_path)) {
+    cli::cli_abort("Could not find file.")
+  }
+
+  train_data <- readr::read_csv(train_path, show_col_types = FALSE)
+  test_data <- readr::read_csv(test_path, show_col_types = FALSE)
+
+  target_name <- "target"
+  if (!"target" %in% names(train_data)) {
+    target_name <- names(test_data)[names(test_data) != "id"]
+    if (length(target_name) != 1) {
+      test_path_wo_outcome <- file.path(
+        "DSBench/data_modeling/data/data_resplit",
+        id,
+        "test.csv"
+      )
+      test_data_wo_outcome <- readr::read_csv(
+        test_path_wo_outcome,
+        show_col_types = FALSE
+      )
+      target_name <- names(test_data)[
+        !names(test_data) %in% names(test_data_wo_outcome)
+      ]
+      if (length(target_name) != 1) {
+        return(list(target_name = NA, baseline = NA))
+      }
+    }
+    train_data$target <- train_data[[target_name]]
+    test_data$target <- test_data[[target_name]]
+  }
+
+  metric_fn <- get(metric_name, envir = asNamespace("yardstick"))
+  mode <- if (inherits(metric_fn, "numeric_metric")) {
+    "regression"
+  } else {
+    "classification"
+  }
+
+  null_spec <- null_model() %>%
+    set_engine("parsnip") %>%
+    set_mode(mode)
+
+  if (identical(mode, "classification")) {
+    train_data$target <- as.factor(train_data$target)
+    test_data$target <- as.factor(test_data$target)
+  }
+
+  split <- rsample::make_splits(
+    x = train_data["target"],
+    assessment = test_data["target"]
+  )
+  null_fit <- last_fit(
+    object = null_spec,
+    preprocessor = target ~ NULL,
+    split = split,
+    metrics = metric_set(metric_fn)
+  )
+
+  list(
+    target_name = target_name,
+    baseline = null_fit[[".metrics"]][[1]]$.estimate
+  )
+}
+
+new_baselines <- vector("list", nrow(modeling_dataset))
+
+cli::cli_progress_bar(
+  "Calculating null model baselines",
+  total = nrow(modeling_dataset),
+  type = "tasks"
+)
+
+for (i in seq_len(nrow(modeling_dataset))) {
+  cli::cli_progress_update(
+    status = paste("Processing", modeling_dataset$id[i])
+  )
+  new_baselines[[i]] <- calculate_null_baseline(
+    modeling_dataset$id[i],
+    modeling_dataset$metric_name[i]
+  )
+}
+
+new_baselines_tbl <- dplyr::bind_rows(new_baselines)
+
+modeling_dataset <-
+  modeling_dataset %>%
+  dplyr::select(-baseline) %>%
+  dplyr::bind_cols(new_baselines_tbl) %>%
+  dplyr::relocate(baseline, .after = target) %>%
+  dplyr::filter(!is.na(target_name)) %>%
+  # if the target truly wasn't found, the target_name would be NA.
+  # otherwise, if there's an NA baseline, the metric is rsq and the
+  # worst possible value is 0.
+  dplyr::mutate(baseline = if_else(is.na(baseline), 0, baseline))
+
 usethis::use_data(modeling_dataset, overwrite = TRUE)
