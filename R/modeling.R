@@ -6,15 +6,15 @@
 #'
 #' * `modeling_dataset` is the dataset underlying the eval.
 #' * `modeling_solver` is the solver, which just prompts the provided chat with the
-#' instruction and working directory provided in `modeling_dataset$input` and
-#' allows the model to "converse" with a mock analyst—an LLM instance that
-#' just gently prods the model along without providing any specific guidance.
+#'   instruction and working directory provided in `modeling_dataset$input` and
+#'   allows the model to "converse" with a mock analyst—an LLM instance that
+#'   just gently prods the model along without providing any specific guidance.
 #' * The scorer for the predictive modeling task is inspired by the original
 #'   benchmark's "Relative Performance Gap" metric. The best analysis set
 #'   error metric found by the model is compared to the best test set error
 #'   metric from the Kaggle competition.
 #' * `modeling_task` combines the dataset, solver, and scorer, as well as a
-#'   measurement Mean(Relative Performance Gap), into a [vitals::Task].
+#'   measurement Mean(Relative Performance), into a [vitals::Task].
 #'
 #' @examples
 #' modeling_dataset
@@ -237,7 +237,7 @@ modeling_task <- function(epochs = 1, dir = ".vitals/logs/modeling/") {
     dataset = modeling_dataset[3, ],
     solver = modeling_solver(),
     scorer = modeling_scorer,
-    metrics = list(relative_performance_gap = relative_performance_gap),
+    metrics = list(relative_performance = relative_performance_gap),
     epochs = epochs,
     name = "predictivebench",
     dir = dir

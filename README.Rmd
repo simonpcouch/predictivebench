@@ -13,14 +13,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-# predictivebench: A data science LLM evaluation
+# predictivebench: A predictive modeling LLM evaluation
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/DSBench)](https://CRAN.R-project.org/package=DSBench)
 <!-- badges: end -->
 
-This repository implements an adaptation of [DSBench](https://arxiv.org/abs/2409.07703), a data science LLM evaluation, in R using [vitals](https://vitals.tidyverse.org/).
+This repository implements an adaptation of the data modeling portion of [DSBench](https://arxiv.org/abs/2409.07703), a data science LLM evaluation, in R using [vitals](https://vitals.tidyverse.org/).
 
 This implementation of the benchmark diverges from the original in a few ways:
 

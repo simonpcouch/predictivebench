@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# predictivebench: A data science LLM evaluation
+# predictivebench: A predictive modeling LLM evaluation
 
 <!-- badges: start -->
 
@@ -11,7 +11,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 status](https://www.r-pkg.org/badges/version/DSBench)](https://CRAN.R-project.org/package=DSBench)
 <!-- badges: end -->
 
-This repository implements an adaptation of
+This repository implements an adaptation of the data modeling portion of
 [DSBench](https://arxiv.org/abs/2409.07703), a data science LLM
 evaluation, in R using [vitals](https://vitals.tidyverse.org/).
 
@@ -20,8 +20,8 @@ ways:
 
 - predictivebench implements only the data modeling section of DSBench.
 - In DSBench, the .xslx, .csv, and other source files are inlined into
-  the user prompt. In predictivebench, models are situated in a working directory
-  where those files exist and must call tools to read them.
+  the user prompt. In predictivebench, models are situated in a working
+  directory where those files exist and must call tools to read them.
 - File names and references are renamed to be less indicative of
   competition data science / model evaluations. This decreases the risk
   of sandbagging, where models will realize they’re being evaluated and

@@ -1,9 +1,10 @@
 Package: predictivebench
-Title: A Data Science Large Language Model Evaluation
+Title: A Data Predictive Modeling Language Model Evaluation
 Version: 0.0.0.9000
 Authors@R: 
     person("Simon", "Couch", , "simon.couch@posit.co", role = c("aut", "cre"))
-Description: A data science large language model evaluation based on 'DSBench'.
+Description: A predictive modeling large language model evaluation based on 
+    the data modeling portion of 'DSBench'.
 License: MIT + file LICENSE
 Imports:
     dplyr,

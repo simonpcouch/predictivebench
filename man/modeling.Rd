@@ -34,7 +34,7 @@ benchmark's "Relative Performance Gap" metric. The best analysis set
 error metric found by the model is compared to the best test set error
 metric from the Kaggle competition.
 \item \code{modeling_task} combines the dataset, solver, and scorer, as well as a
-measurement Mean(Relative Performance Gap), into a \link[vitals:Task]{vitals::Task}.
+measurement Mean(Relative Performance), into a \link[vitals:Task]{vitals::Task}.
 }
 }
 \section{Scoring}{
