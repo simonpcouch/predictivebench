@@ -18,7 +18,7 @@ modeling_solver(solver_chat = NULL)
 
 modeling_scorer(samples, ...)
 
-modeling_task(epochs = 1, dir = ".vitals/logs/modeling/")
+modeling_task(epochs = 1, dir = ".vitals/logs/")
 }
 \description{
 Objects prefixed with \code{modeling_} correspond to the predictive modeling

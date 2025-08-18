@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(DSBench)
+library(predictivebench)
 
-test_check("DSBench")
+test_check("predictivebench")

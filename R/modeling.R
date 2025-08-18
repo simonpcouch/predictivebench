@@ -232,7 +232,7 @@ relative_performance_gap <- function(scores) {
 # task -------------------------------------------------------------------------
 #' @rdname modeling
 #' @export
-modeling_task <- function(epochs = 1, dir = ".vitals/logs/modeling/") {
+modeling_task <- function(epochs = 1, dir = ".vitals/logs/") {
   vitals::Task$new(
     dataset = modeling_dataset[3, ],
     solver = modeling_solver(),
