@@ -1,4 +1,4 @@
-## dseval
+## predictivebench
 
 This repository implements a variant of DSBench, a data science LLM evaluation, compatible with [Inspect AI](https://inspect.aisi.org.uk/) and [vitals](https://vitals.tidyverse.org/).
 

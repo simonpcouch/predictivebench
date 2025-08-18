@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# dseval: A data science LLM evaluation
+# predictivebench: A data science LLM evaluation
 
 <!-- badges: start -->
 
@@ -18,9 +18,9 @@ evaluation, in R using [vitals](https://vitals.tidyverse.org/).
 This implementation of the benchmark diverges from the original in a few
 ways:
 
-- dseval implements only the data modeling section of DSBench.
+- predictivebench implements only the data modeling section of DSBench.
 - In DSBench, the .xslx, .csv, and other source files are inlined into
-  the user prompt. In dseval, models are situated in a working directory
+  the user prompt. In predictivebench, models are situated in a working directory
   where those files exist and must call tools to read them.
 - File names and references are renamed to be less indicative of
   competition data science / model evaluations. This decreases the risk
@@ -56,7 +56,7 @@ ways:
 
 ``` r
 library(tibble)
-library(dseval)
+library(predictivebench)
 
 modeling_dataset
 #> # A tibble: 38 × 5

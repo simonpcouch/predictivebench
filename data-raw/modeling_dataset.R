@@ -170,7 +170,7 @@ introduction_basenames_kept <- introduction_basenames_kept[
 # }
 
 #best_scores <- get_all_kaggle_best_scores()
-load(system.file("data-raw/best_scores.rda", package = "dseval"))
+load(system.file("data-raw/best_scores.rda", package = "predictivebench"))
 
 targets <- best_scores
 targets <- setNames(targets$best_score, targets$name)

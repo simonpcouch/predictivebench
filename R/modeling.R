@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Objects prefixed with `modeling_` correspond to the predictive modeling
-#' benchmark in dseval.
+#' benchmark in predictivebench.
 #'
 #' * `modeling_dataset` is the dataset underlying the eval.
 #' * `modeling_solver` is the solver, which just prompts the provided chat with the
@@ -76,7 +76,10 @@ modeling_solve_one <- function(input, chat) {
       "",
       "The training data is called train.csv and the testing data test.csv. Resample the training data with vfold_cv.",
       "",
-      readLines(system.file("submission_format.md", package = "dseval"))
+      readLines(system.file(
+        "submission_format.md",
+        package = "predictivebench"
+      ))
     ),
     collapse = "\n"
   ))
@@ -236,7 +239,7 @@ modeling_task <- function(epochs = 1, dir = ".vitals/logs/modeling/") {
     scorer = modeling_scorer,
     metrics = list(relative_performance_gap = relative_performance_gap),
     epochs = epochs,
-    name = "dseval",
+    name = "predictivebench",
     dir = dir
   )
 }

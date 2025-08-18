@@ -85,13 +85,13 @@ create_analysis_dataset <- function() {
   res
 }
 
-dseval_raw <- create_analysis_dataset()
+predictivebench_raw <- create_analysis_dataset()
 
 # This competition seems to be mostly be asking about understanding of
 # some set of business concepts; more about raw knowledge than analysis.
-dseval_d <- filter(dseval_raw, competition_id == "00000002")
+predictivebench_d <- filter(predictivebench_raw, competition_id == "00000002")
 
-dseval_d <- tidyr::unnest(dseval_d, input)
+predictivebench_d <- tidyr::unnest(predictivebench_d, input)
 
 # Now, we have:
 # * target: The multiple choice corresponding to the correct answer
@@ -107,7 +107,7 @@ dseval_d <- tidyr::unnest(dseval_d, input)
 # * input$dir: As it was.
 
 prompts <- glue::glue_data(
-  dseval_d,
+  predictivebench_d,
   "
 Here's some information on a multiple choice question:
 
@@ -150,7 +150,10 @@ res <- parallel_chat_structured(
   )
 )
 
-d <- dplyr::bind_cols(dseval_d[!names(dseval_d) %in% names(res)], res)
+d <- dplyr::bind_cols(
+  predictivebench_d[!names(predictivebench_d) %in% names(res)],
+  res
+)
 
 # save(d, file = "inst/data-raw/d_pre_split.rda")
 

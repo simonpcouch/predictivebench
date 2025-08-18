@@ -22,7 +22,7 @@ modeling_task(epochs = 1, dir = ".vitals/logs/modeling/")
 }
 \description{
 Objects prefixed with \code{modeling_} correspond to the predictive modeling
-benchmark in dseval.
+benchmark in predictivebench.
 \itemize{
 \item \code{modeling_dataset} is the dataset underlying the eval.
 \item \code{modeling_solver} is the solver, which just prompts the provided chat with the

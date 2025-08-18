@@ -2,7 +2,7 @@
 #
 # @description
 # Objects prefixed with `analysis_` correspond to the data analysis benchmark in
-# dseval.
+# predictivebench.
 #
 # * `analysis_dataset` is the dataset underlying the eval.
 # * `analysis_solver` is the solver, which just prompts the provided chat with the
@@ -22,7 +22,7 @@
 # tsk$eval(solver_chat = databot:::chat_bot())
 #
 # @name analysis
-# @aliases dseval
+# @aliases predictivebench
 
 # dataset ----------------------------------------------------------------------
 # @rdname analysis
@@ -98,7 +98,7 @@ analysis_task <- function(epochs = 1, dir = ".vitals/logs/analysis/") {
     solver = analysis_solver(),
     scorer = vitals::model_graded_qa(),
     epochs = epochs,
-    name = "dseval",
+    name = "predictivebench",
     dir = dir
   )
 }
