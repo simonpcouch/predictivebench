@@ -218,7 +218,12 @@ calculate_metric <- function(...) {
   truth <- read.csv(truth_path)
 
   if ("id" %in% colnames(truth) && "id" %in% colnames(submission)) {
-    result <- dplyr::left_join(truth, submission, by = dplyr::join_by(id))
+    result <- dplyr::left_join(
+      truth,
+      submission,
+      by = c("id"),
+      suffix = c("", ".y")
+    )
   } else {
     result <- dplyr::bind_cols(truth, submission)
   }
