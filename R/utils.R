@@ -22,10 +22,9 @@ converse <- function(
     FALSE
   }
 ) {
-  assistant_response_initial <- assistant$chat("Hello!", echo = FALSE)
   assistant_response <- assistant$chat(question, echo = FALSE)
   analyst$set_turns(list(
-    ellmer::Turn("user", assistant_response_initial),
+    ellmer::Turn("user", "How can I help you?"),
     ellmer::Turn("assistant", question)
   ))
 
