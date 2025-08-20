@@ -183,7 +183,10 @@ modeling_scorer <- function(samples, ...) {
     score = purrr::pmap_dbl(res, relative_performance_gap_i),
     scorer_metadata = tibble::tibble(
       metric = samples$metric,
-      caught = purrr::map(metrics, purrr::pluck, "error")
+      caught = purrr::map_chr(
+        purrr::map(metrics, purrr::pluck, "error"),
+        as.character
+      )
     )
   )
 }
@@ -195,7 +198,7 @@ calculate_metric_safely <- function(...) {
 calculate_metric <- function(...) {
   dots <- list(...)
 
-  submission <- dots$solver_metadata
+  submission <- tibble::as_tibble(dots$solver_metadata)
   target_name <- dots$target_name
   metric_name <- dots$metric_name
   metric_fn <- getFromNamespace(dots$metric_name, "yardstick")
@@ -209,20 +212,29 @@ calculate_metric <- function(...) {
   truth <- read.csv(truth_path)
   result <- dplyr::bind_cols(truth, submission)
 
-  if (inherits(metric_fn, "numeric_metric")) {
-    metric_st(result, truth = target_name, estimate = .pred)$.estimate
-  } else {
-    result[[target_name]] <- factor(
-      result[[target_name]],
-      levels = levels(result[[".pred_class"]])
-    )
-    metric_st(
-      result,
-      truth = target_name,
-      estimate = .pred_class,
-      c(contains(".pred_"), -.pred_class)
-    )$.estimate
+  if (!inherits(metric_fn, "numeric_metric")) {
+    lvls <- colnames(result)
+    lvls <- lvls[grepl(".pred_", lvls, fixed = TRUE)]
+    lvls <- lvls[lvls != ".pred_class"]
+    lvls <- gsub(".pred_", "", lvls, fixed = TRUE)
+
+    .pred_class <- factor(result[[".pred_class"]])
+    levels(.pred_class) <- lvls
+    result[[".pred_class"]] <- .pred_class
+
+    target <- factor(result[[target_name]])
+    levels(target) <- lvls
+    result[[target_name]] <- target
   }
+
+  tune::.estimate_metrics(
+    result,
+    metric_st,
+    param_names = NULL,
+    outcome_name = target_name,
+    event_level = "first",
+    metrics = tune:::metrics_info(metric_st)
+  )$.estimate
 }
 
 get_metric_direction <- function(metric_name) {
