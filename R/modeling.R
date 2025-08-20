@@ -184,12 +184,14 @@ modeling_scorer <- function(samples, ...) {
   )
 }
 
-# TODO: this won't work for classification
 calculate_metric <- function(...) {
   dots <- list(...)
 
   submission <- dots$solver_metadata
-  # TODO: this should actually live in the eval itself / in inst
+  target_name <- dots$target_name
+  metric_name <- dots$metric_name
+  metric_fn <- getFromNamespace(dots$metric_name, "yardstick")
+  metric_st <- yardstick::metric_set(metric_fn)
 
   truth_path <- file.path(
     "DSBench/data_modeling/data/answers",
@@ -198,11 +200,18 @@ calculate_metric <- function(...) {
   )
   truth <- read.csv(truth_path)
   in_common <- colnames(truth)[colnames(truth) %in% colnames(submission)]
-  outcome_name <- colnames(truth)[!colnames(truth) %in% c(in_common, "id")]
-  pred_names <- colnames(submission)[!colnames(submission) %in% in_common]
   result <- dplyr::left_join(truth, submission, by = in_common)
-  metric_fn <- getFromNamespace(dots$metric_name, "yardstick")
-  metric_fn(result, truth = outcome_name, estimate = pred_names)$.estimate
+
+  if (inherits(metric_fn, "numeric_metric")) {
+    metric_st(result, truth = target_name, estimate = .pred)$.estimate
+  } else {
+    metric_st(
+      result,
+      truth = target_name,
+      estimate = .pred_class,
+      contains(".pred_")
+    )$.estimate
+  }
 }
 
 get_metric_direction <- function(metric_name) {
