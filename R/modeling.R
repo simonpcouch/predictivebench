@@ -173,15 +173,23 @@ has_not_submitted <- function() {
 #' @rdname modeling
 #' @export
 modeling_scorer <- function(samples, ...) {
-  samples$metric <- purrr::pmap(samples, calculate_metric)
+  metrics <- purrr::pmap(samples, calculate_metric_safely)
+  samples$metric <- purrr::map_dbl(metrics, purrr::pluck, "result")
   samples$directions <- purrr::map(samples$metric_name, get_metric_direction)
   res <- samples[c("metric", "target", "baseline", "directions")]
   names(res) <- c("observed", "best", "baseline", "direction")
 
   list(
     score = purrr::pmap_dbl(res, relative_performance_gap_i),
-    scorer_metadata = list(metric = samples$metric)
+    scorer_metadata = tibble::tibble(
+      metric = samples$metric,
+      caught = purrr::map(metrics, purrr::pluck, "error")
+    )
   )
+}
+
+calculate_metric_safely <- function(...) {
+  purrr::safely(calculate_metric, otherwise = NA)(...)
 }
 
 calculate_metric <- function(...) {
@@ -227,6 +235,10 @@ get_metric_direction <- function(metric_name) {
 # best is the winning result on kaggle, and
 # baseline is the metric resulting from a null model.
 relative_performance_gap_i <- function(observed, best, baseline, direction) {
+  if (is.na(observed)) {
+    return(0)
+  }
+
   if (identical(direction, "minimize")) {
     observed <- -observed
     best <- -best
