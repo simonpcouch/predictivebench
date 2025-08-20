@@ -199,17 +199,20 @@ calculate_metric <- function(...) {
     "test_answer.csv"
   )
   truth <- read.csv(truth_path)
-  in_common <- colnames(truth)[colnames(truth) %in% colnames(submission)]
-  result <- dplyr::left_join(truth, submission, by = in_common)
+  result <- dplyr::bind_cols(truth, submission)
 
   if (inherits(metric_fn, "numeric_metric")) {
     metric_st(result, truth = target_name, estimate = .pred)$.estimate
   } else {
+    result[[target_name]] <- factor(
+      result[[target_name]],
+      levels = levels(result[[".pred_class"]])
+    )
     metric_st(
       result,
       truth = target_name,
       estimate = .pred_class,
-      contains(".pred_")
+      c(contains(".pred_"), -.pred_class)
     )$.estimate
   }
 }
