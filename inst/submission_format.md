@@ -1,6 +1,6 @@
 ## Submission format
 
-The return value is a submission.csv file with predictions with the **same number of rows as the data being predicted** and in the same order. For observations with missing data such that a prediction cannot be generated, return `NA`. 
+The return value is a submission.csv file with predictions with the **same number of rows as the data being predicted** and in the original order from `test.csv`. Do not reorder rows. For observations with missing data such that a prediction cannot be generated, return `NA`. 
 
 If you're using tidymodels, the submission can be `write.csv(collect_predictions(last_fit(<some_workflow>)), file = "submission.csv")` (or `augment(<some_workflow>)` for a fitted workflow). If you use either of those functions, provide their output exactly as-is.
   

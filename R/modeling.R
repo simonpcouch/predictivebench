@@ -185,7 +185,13 @@ modeling_scorer <- function(samples, ...) {
       metric = samples$metric,
       caught = purrr::map_chr(
         purrr::map(metrics, purrr::pluck, "error"),
-        as.character
+        function(x) {
+          if (is.null(x)) {
+            ""
+          } else {
+            as.character(x)
+          }
+        }
       )
     )
   )
@@ -210,7 +216,12 @@ calculate_metric <- function(...) {
     "test_answer.csv"
   )
   truth <- read.csv(truth_path)
-  result <- dplyr::bind_cols(truth, submission)
+
+  if ("id" %in% colnames(truth) && "id" %in% colnames(submission)) {
+    result <- dplyr::left_join(truth, submission, by = dplyr::join_by(id))
+  } else {
+    result <- dplyr::bind_cols(truth, submission)
+  }
 
   if (!inherits(metric_fn, "numeric_metric")) {
     lvls <- colnames(result)
