@@ -75,7 +75,7 @@ sample_by_size <-
   pull(id) %>%
   match(modeling_dataset$id)
 
-tsk <- modeling_task(samples = sample_by_size[1])
+tsk <- modeling_task(samples = sample_by_size[1:3])
 
 # run_r_code only ----------------------------------------------------------------
 tsk_claude_4_sonnet_run_r_code <- tsk$clone()
