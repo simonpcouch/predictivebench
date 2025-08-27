@@ -1,37 +1,37 @@
-mock_analyst <- function() {
-  ellmer::chat_openai(
-    system_prompt = paste(c(
-      "You are role-playing an analyst using an AI assistant.",
-      "The assistant is helping you carry out a data analysis and may occasionally ask for your feedback on some analytical decision.",
-      "Your job is to keep the conversation going while saying as little as possible.",
-      "If the assistant just checks in to get your thumbs-up on some decision, you might say 'Sounds good.' or something of the like.",
-      "If the assistant asks you an open-ended question, just ask the assistant to use its best judgment.",
-      "If the assistant asks you whether some final answer to your question is satisfactory, affirm it and tell it to move forward in submitting the solution.",
-      "Be terse."
-    )),
-    model = "gpt-4.1-mini"
-  )
-}
+the <- rlang::new_environment()
+the$assistant_is_finished <- FALSE
+
+end_conversation <- ellmer::tool(
+  function() {
+    the$assistant_is_finished <- TRUE
+  },
+  description = "
+As the mock user of an AI tool, it is your responsibility to determine when your conversation with the assistant (the conversant other than you) is finished.
+
+Call this tool either when 1) the assistant is satisfied the performance of the best ML model it has built so far, or 2) the assistant is unable to recover from errors it is encountering with the `run_experiment` tool.
+",
+  name = "end_conversation"
+)
 
 converse <- function(
   assistant,
   question,
-  analyst = mock_analyst(),
-  keyword,
-  hook = function(chat) {
-    FALSE
-  }
+  analyst
 ) {
-  assistant_response <- assistant$chat(question, echo = FALSE)
-  analyst$set_turns(list(
-    ellmer::Turn("user", "How can I help you?"),
-    ellmer::Turn("assistant", question)
-  ))
+  the$assistant_is_finished <- FALSE
+  analyst_response <- question
 
-  while (!grepl(keyword, assistant_response) || hook(assistant)) {
-    analyst_response <- analyst$chat(assistant_response, echo = FALSE)
+  while (!the$assistant_is_finished) {
     assistant_response <- assistant$chat(analyst_response, echo = FALSE)
+    if (in_debug_mode()) {
+      return(assistant)
+    }
+    analyst_response <- analyst$chat(assistant_response, echo = FALSE)
   }
 
   assistant
+}
+
+in_debug_mode <- function() {
+  identical(Sys.getenv("PREDICTIVEBENCH_DEBUG_MODE"), "true")
 }
