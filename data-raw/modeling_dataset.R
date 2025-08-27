@@ -215,7 +215,7 @@ splits_paths <- file.path(
 inputs <- list()
 for (i in seq_along(introduction_basenames_kept)) {
   inputs[[i]] <- tibble::tibble(
-    question = list(introductions[[i]]),
+    knowledge = list(introductions[[i]]),
     dir = file.path(
       "DSBench/data_modeling/data/data_resplit",
       basename(introduction_basenames_kept[i])
@@ -232,57 +232,8 @@ modeling_d <-
     metric_name = unlist(metrics[basename(introduction_basenames_kept)])
   )
 
-# store the results of the deterministic processing before rephrasing via LLMs
-save(modeling_d, file = "inst/data-raw/modeling_d.Rda")
 
-modeling_dataset <- tidyr::unnest(modeling_d, input)
-modeling_dataset$question <- vapply(
-  modeling_dataset$question,
-  paste0,
-  character(1),
-  collapse = "\n"
-)
-
-split_prompts <- glue::glue_data(
-  modeling_dataset,
-  "
-The following is an introduction to a data modeling competition. Taken together with some data files, the introduction provides the full context needed to build a machine learning model based on the data, optimized against some metric.
-
-{{introduction}}\n{question}\n{{/introduction}}\n 
-
-I'd like to split this introduction into two parts:
-
-1. question: A brief initial prompt (3-4 sentences) that an analyst might write in first person when asking an AI assistant for help with a data modeling problem. This should note that the user wants to model some data called `train` in the current wd, give a high-level description of what the data is about, and note the error metric of interest if it's included in the introduction. (Note metrics by name--leave implementation details for `knowledge`.) Notably, there should be no mention that the data is from a competition. The question should sound like a typical analyst might have written it when initially approaching an AI assistant for help and be written in first-person; write colloquially.
-
-2. knowledge: The remaining detailed information, context, and specifics from the introduction. Include all of the factual information from the introduction. Exclude any information that wouldn't be helpful for answering the question; information describing the history and context on a data modeling competition generally rather than the task at hand should be excluded. From this additional context, a reader should be able to understand the modeling problem as it relates to some scientific or business objective but not be aware the modeling problem arose from a competition.
-"
-)
-
-ch_split <- chat_anthropic(model = "claude-sonnet-4-20250514")
-split_res <- parallel_chat_structured(
-  ch_split,
-  as.list(split_prompts),
-  type_object(
-    question = type_string(
-      description = "A brief initial prompt (3-4 sentences) in first person that an analyst might write when asking an AI assistant for help with a data modeling problem."
-    ),
-    knowledge = type_string(
-      description = "The remaining detailed information, context, and specifics from the introduction, excluding any advertising or context about the data modeling competition that isn't related to this task specifically."
-    )
-  )
-)
-
-save(split_res, file = "inst/data-raw/split_res_modeling.rda")
-
-modeling_dataset <- dplyr::bind_cols(
-  modeling_dataset[!names(modeling_dataset) %in% names(split_res)],
-  split_res
-)
-
-modeling_dataset <- modeling_dataset %>%
-  tidyr::nest(input = c(question, knowledge, dir))
-
-modeling_dataset <- dplyr::relocate(modeling_dataset, input, .after = id)
+modeling_dataset <- dplyr::relocate(modeling_d, input, .after = id)
 
 # calculate deterministic baselines using tidymodels null_model() (#8) ---------
 library(tidymodels)

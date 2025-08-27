@@ -23,7 +23,7 @@ converse <- function(
 
   while (!the$assistant_is_finished) {
     assistant_response <- assistant$chat(analyst_response, echo = FALSE)
-    if (in_debug_mode()) {
+    if (in_debug_mode() && has_run_experiments()) {
       return(assistant)
     }
     analyst_response <- analyst$chat(assistant_response, echo = FALSE)
@@ -34,4 +34,11 @@ converse <- function(
 
 in_debug_mode <- function() {
   identical(Sys.getenv("PREDICTIVEBENCH_DEBUG_MODE"), "true")
+}
+
+
+has_run_experiments <- function() {
+  the_predictive <- getFromNamespace("the", rlang::ns_env("predictive"))
+
+  length(the_predictive$experiments) >= 2
 }

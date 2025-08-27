@@ -169,3 +169,19 @@ save(
   tsk_gemini_2_5_pro_predictive,
   file = ".vitals/tasks/tsk_gemini_2_5_pro_predictive.rda"
 )
+
+# quicker evals to test against
+quick_predictive <- function(chat) {
+  ch <- chat$clone()
+  ch <- predictive:::predictive_client(ch, default_turns = list())
+  ch$set_system_prompt("")
+  ch
+}
+
+Sys.setenv("PREDICTIVEBENCH_DEBUG_MODE" = "true")
+
+tsk <- modeling_task(samples = sample_by_size[1])
+tsk_claude_4_sonnet_predictive <- tsk$clone()
+tsk_claude_4_sonnet_predictive$eval(
+  solver_chat = quick_predictive(claude_4_sonnet)
+)

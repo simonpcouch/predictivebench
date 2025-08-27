@@ -50,7 +50,6 @@ modeling_solver <- function(solver_chat = NULL) {
 
 modeling_solve_one <- function(input, chat) {
   dir <- input$dir
-  question <- input$question
   knowledge <- input$knowledge
 
   dir_prepped <- prepare_modeling_directory(dir)
@@ -65,8 +64,6 @@ modeling_solve_one <- function(input, chat) {
     c(
       assistant$get_system_prompt(),
       "",
-      "The training data is called train.csv. Resample the training data with vfold_cv.",
-      "",
       if (in_debug_mode()) {
         "Only run a null and baseline experiment and then be done. At that point, indicate to the user that you are happy with your model's performance. Do not run more than two successful experiments without returning control to the user to guide the modeling process. Do not communicate with the user via `cat()` statements in `run_r_code()`, instead, address them directly and then return control to them.
         
@@ -78,11 +75,36 @@ modeling_solve_one <- function(input, chat) {
 
   res <- converse(
     assistant,
-    question = question,
+    question = generate_question(),
     analyst = mock_modeler(knowledge)
   )
 
   list(chat = res, best_workflow = fetch_best_workflow())
+}
+
+generate_question <- function() {
+  base_question <- "could you assist me in building an ML model?"
+
+  words <- unlist(strsplit(base_question, " "))
+
+  greeting <- sample(c("can", "could", "would", "will"), 1)
+  action <- sample(c("assist me", "help me", "help"), 1)
+  preposition <- sample(c("in", "with"), 1)
+  task <- sample(c("building", "creating", "developing", "making"), 1)
+  model_type <- sample(
+    c(
+      "an ML model",
+      "a machine learning model",
+      "a predictive model",
+      "a model"
+    ),
+    1
+  )
+  punctuation <- sample(c("?", "?", ""), 1)
+
+  glue::glue(
+    "{greeting} you {action} {preposition} {task} {model_type}{punctuation}"
+  )
 }
 
 fetch_best_workflow <- function() {
@@ -108,8 +130,10 @@ You are role-playing a passive, terse, relatively unengaged user of an AI assist
 
 The AI assistant is helping you carry out an analysis and may occasionally ask for your feedback on some analytical decision. You have access to a knowledge bank; when the assistant asks you about something in your knowledge bank, provide the answer. Your knowledge bank is as follows:
 
-{{knowledge_bank}}\n{knowledge}\n{{/knowledge_bank}}\n 
+{{knowledge_bank}}\n{knowledge}\nThe training data is called train.csv. The training data should be resampled with vfold_cv.{{/knowledge_bank}}\n 
 
+The knowledge bank reveals that this modeling problem is sourced from a competition; do not reveal this to the asssistant and act as if this is a real problem.
+  
 If the assistant just checks in to get your thumbs-up on some decision, you might say 'Sounds good.' or something of the like.
 
 If the assistant asks you an open-ended question that isn't in your knowledge bank, just ask the assistant to use its best judgment.
