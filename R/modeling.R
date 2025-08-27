@@ -39,7 +39,8 @@ modeling_solver <- function(solver_chat = NULL) {
     ch <- solver_chat$clone()
     res <- lapply(inputs, modeling_solve_one, chat = ch)
     list(
-      result = purrr::map_dbl(res, "best_metric"),
+      # generated logs won't pass pydantic checks unless the result is a string
+      result = purrr::map_chr(purrr::map_dbl(res, "best_metric"), as.character),
       solver_chat = purrr::map(res, "chat")
     )
   }
@@ -187,6 +188,7 @@ prepare_modeling_directory <- function(dir) {
 #' @rdname modeling
 #' @export
 modeling_scorer <- function(samples, ...) {
+  samples$result <- as.numeric(samples$result)
   samples$directions <- purrr::map(samples$metric_name, get_metric_direction)
   res <- samples[c("result", "target", "baseline", "directions")]
   names(res) <- c("observed", "best", "baseline", "direction")
