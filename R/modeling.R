@@ -163,6 +163,9 @@ prepare_modeling_directory <- function(dir) {
   files <- fs::dir_ls(dir, regexp = "train", type = "file")
   fs::file_copy(files, ".vitals/solver")
 
+  # ensure that the correct wd will be shown even if the agent runs here::here()
+  fs::file_create(file.path(dir, ".here"))
+
   ".vitals/solver"
 }
 
