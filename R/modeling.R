@@ -51,6 +51,9 @@ modeling_solve_one <- function(input, chat) {
   knowledge <- input$knowledge
   target_variable <- input$target_variable
 
+  # clear `has_run_experiments()` hook by initializing a throwaway client
+  predictive:::predictive_client()
+
   dir_prepped <- prepare_modeling_directory(dir)
   withr::defer(unlink(dir_prepped, recursive = TRUE))
 
