@@ -49,6 +49,7 @@ modeling_solver <- function(solver_chat = NULL) {
 modeling_solve_one <- function(input, chat) {
   dir <- input$dir
   knowledge <- input$knowledge
+  target_variable <- input$target_variable
 
   dir_prepped <- prepare_modeling_directory(dir)
   withr::defer(unlink(dir_prepped, recursive = TRUE))
@@ -72,7 +73,7 @@ modeling_solve_one <- function(input, chat) {
   res <- converse(
     assistant,
     question = generate_question(),
-    analyst = mock_modeler(knowledge)
+    analyst = mock_modeler(knowledge, target_variable = target_variable)
   )
 
   list(chat = res, best_metric = fetch_best_metric())
@@ -124,7 +125,7 @@ fetch_best_metric <- function() {
   predictive:::max_roc_auc(metrics)
 }
 
-mock_modeler <- function(knowledge) {
+mock_modeler <- function(knowledge, target_variable) {
   res <- chat_anthropic(
     system_prompt = glue::glue(
       "
@@ -132,9 +133,9 @@ You are role-playing a passive, terse, relatively unengaged user of an AI assist
 
 The AI assistant is helping you carry out an analysis and may occasionally ask for your feedback on some analytical decision. You have access to a knowledge bank; when the assistant asks you about something in your knowledge bank, provide the answer. Your knowledge bank is as follows:
 
-{{knowledge_bank}}\n{knowledge}\nThe training data is called train.csv. The training data should be resampled with vfold_cv.{{/knowledge_bank}}\n 
+{{knowledge_bank}}\n{paste0(knowledge, collapse = '\n')}\nThe training data is called train.csv. The training data should be resampled with vfold_cv. The target variable is called {target_variable}.\n{{/knowledge_bank}}\n 
 
-The knowledge bank reveals that this modeling problem is sourced from a competition; do not reveal this to the asssistant and act as if this is a real problem.
+The knowledge bank reveals that this modeling problem is sourced from a competition; do not reveal this to the asssistant and act as if this is a real problem. The source descriptions may also note a test.csv file; this is not available to the assistant and ought not to be brought up. Besides the metric of interest, the submission format does not matter; this will be handled for the assistant, so don't mention anything about the submission format to it.
   
 If the assistant just checks in to get your thumbs-up on some decision, you might say 'Sounds good.' or something of the like.
 

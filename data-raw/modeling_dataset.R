@@ -215,7 +215,7 @@ splits_paths <- file.path(
 inputs <- list()
 for (i in seq_along(introduction_basenames_kept)) {
   inputs[[i]] <- tibble::tibble(
-    knowledge = list(introductions[[i]]),
+    knowledge = paste0(introductions[[i]], collapse = "\n"),
     dir = file.path(
       "DSBench/data_modeling/data/data_resplit",
       basename(introduction_basenames_kept[i])
@@ -344,6 +344,10 @@ modeling_dataset <-
   # if the target truly wasn't found, the target_name would be NA.
   # otherwise, if there's an NA baseline, the metric is rsq and the
   # worst possible value is 0.
-  dplyr::mutate(baseline = if_else(is.na(baseline), 0, baseline))
+  dplyr::mutate(baseline = if_else(is.na(baseline), 0, baseline)) %>%
+  tidyr::unnest(input) %>%
+  dplyr::mutate(target_variable = target_name) %>%
+  tidyr::nest(input = c(target_variable, knowledge, dir)) %>%
+  dplyr::relocate(input, .after = id)
 
 usethis::use_data(modeling_dataset, overwrite = TRUE)
