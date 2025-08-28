@@ -158,15 +158,20 @@ If the assistant is repeatedly unable to use its `run_experiment` tool successfu
 
 # makes a directory that only has the files for analysis inside of it
 prepare_modeling_directory <- function(dir) {
-  fs::dir_create(".vitals/solver")
+  subdir <- prepare_modeling_subdirectory(dir)
+  fs::dir_create(subdir)
 
   files <- fs::dir_ls(dir, regexp = "train", type = "file")
-  fs::file_copy(files, ".vitals/solver")
+  fs::file_copy(files, subdir)
 
   # ensure that the correct wd will be shown even if the agent runs here::here()
   fs::file_create(file.path(dir, ".here"))
 
-  ".vitals/solver"
+  subdir
+}
+
+prepare_modeling_subdirectory <- function(dir) {
+  file.path(".vitals", "solver", sample(0:1000, 1))
 }
 
 # scorer -----------------------------------------------------------------------
