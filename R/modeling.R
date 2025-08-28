@@ -119,6 +119,12 @@ fetch_best_metric <- function() {
     card_labels == "New best!"
   )]
 
+  if (length(best_result) == 0) {
+    best_result <- names(the_predictive$experiments)[length(
+      the_predictive$experiments
+    )]
+  }
+
   metrics <- the_predictive$experiments[[best_result]]$metrics
 
   if ("rmse" %in% metrics$.metric) {
