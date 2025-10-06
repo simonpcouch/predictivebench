@@ -3,11 +3,12 @@ library(tidyverse)
 devtools::load_all()
 
 # models of interest ----------------------------------------------------------
-claude_4_sonnet <- chat_anthropic(model = "claude-sonnet-4-20250514")
+claude_4_5_sonnet <- chat_anthropic(model = "claude-sonnet-4-5-20250929")
 gpt_4_1 <- chat_openai(model = "gpt-4.1")
 gemini_2_5_pro <- chat_google_gemini(
   model = "gemini-2.5-pro"
 )
+gpt_4_1_mini <- chat_openai(model = "gpt-4.1-mini")
 
 # solvers of interest ---------------------------------------------------------
 # predictive's prompt and tools run_r_code, run_experiment, btw docs tools
@@ -51,21 +52,24 @@ nrows %>% dplyr::arrange(nrow)
 sample_by_size <-
   modeling_dataset[which(uses_default_metrics), ] %>%
   left_join(nrows, by = join_by(id)) %>%
+  filter(metric_name %in% c("roc_auc", "rmse")) %>%
   arrange(nrow) %>%
   pull(id) %>%
   match(modeling_dataset$id)
 
 tsk <- modeling_task(samples = sample_by_size[1])
 
+# Sys.setenv("PREDICTIVEBENCH_DEBUG_MODE" = "true")
+
 # predictive --------------------------------------------------------------------
-tsk_claude_4_sonnet_predictive <- tsk$clone()
-tsk_claude_4_sonnet_predictive$eval(
-  solver_chat = solver_predictive(claude_4_sonnet)
+tsk_claude_4_5_sonnet_predictive <- tsk$clone()
+tsk_claude_4_5_sonnet_predictive$eval(
+  solver_chat = solver_predictive(claude_4_5_sonnet)
 )
 
 save(
-  tsk_claude_4_sonnet_predictive,
-  file = ".vitals/tasks/tsk_claude_4_sonnet_predictive.rda"
+  tsk_claude_4_5_sonnet_predictive,
+  file = ".vitals/tasks/tsk_claude_4_5_sonnet_predictive.rda"
 )
 
 tsk_gpt_4_1_predictive <- tsk$clone()
@@ -86,4 +90,14 @@ tsk_gemini_2_5_pro_predictive$eval(
 save(
   tsk_gemini_2_5_pro_predictive,
   file = ".vitals/tasks/tsk_gemini_2_5_pro_predictive.rda"
+)
+
+tsk_gpt_4_1_mini_predictive <- tsk$clone()
+tsk_gpt_4_1_mini_predictive$eval(
+  solver_chat = solver_predictive(gpt_4_1_mini)
+)
+
+save(
+  tsk_gpt_4_1_predictive,
+  file = ".vitals/tasks/tsk_gpt_4_1_mini_predictive.rda"
 )
