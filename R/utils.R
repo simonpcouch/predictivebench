@@ -23,13 +23,52 @@ converse <- function(
 
   while (!the$assistant_is_finished) {
     assistant_response <- assistant$chat(analyst_response, echo = FALSE)
+
     if (in_debug_mode() && has_run_experiments()) {
       return(assistant)
     }
-    analyst_response <- analyst$chat(assistant_response, echo = FALSE)
+
+    analyst_response <- analyst_chat(
+      # Don't maintain context in the analyst at all--just reassemble it
+      # from the assistant each time.
+      analyst$clone(),
+      assistant$get_turns()
+    )
   }
 
   assistant
+}
+
+# The mock modeler can get confused about which role it's supposed to be playing.
+# To combat this, format the messages ourselves to reinforce the role-play.
+analyst_chat <- function(
+  analyst,
+  assistant_turns
+) {
+  assembled_message <- paste0(
+    vapply(
+      assistant_turns,
+      function(turn) {
+        role_label <- if (turn@role == "assistant") {
+          "User [ACTUALLY ANOTHER AI MODEL]"
+        } else {
+          "Assistant [THIS IS YOU, A MOCK USER]"
+        }
+        paste0(role_label, ": ", ellmer::contents_markdown(turn))
+      },
+      character(1)
+    ),
+    collapse = "\n\n"
+  )
+
+  analyst$chat(
+    paste0(
+      assembled_message,
+      "\n\n",
+      "Assistant [THIS IS YOU, A MOCK USER]:"
+    ),
+    echo = FALSE
+  )
 }
 
 in_debug_mode <- function() {
