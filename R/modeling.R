@@ -59,7 +59,13 @@ modeling_solve_one <- function(input, chat) {
 
   # TODO: this should probably actually live inside of a docker container or
   # something more properly sandboxed
-  withr::local_dir(dir_prepped)
+  wd <- here::here()
+  testthat::local_mocked_bindings(
+    here = function(...) {
+      file.path(wd, dir_prepped, ...)
+    },
+    .package = "here"
+  )
 
   assistant <- chat$clone()
   assistant$set_system_prompt(paste0(
@@ -201,7 +207,7 @@ prepare_modeling_directory <- function(dir) {
   fs::file_copy(files, subdir)
 
   # ensure that the correct wd will be shown even if the agent runs here::here()
-  fs::file_create(file.path(dir, ".here"))
+  fs::file_create(file.path(subdir, ".here"))
 
   subdir
 }
