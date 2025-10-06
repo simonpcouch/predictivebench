@@ -138,23 +138,53 @@ mock_modeler <- function(knowledge, target_variable) {
   res <- chat_anthropic(
     system_prompt = glue::glue(
       "
-You are role-playing a passive, terse, relatively unengaged user of an AI assistant. In this conversation, the 'user' is actually another AI assistant that you are conversing with. As the 'assistant', you are actually acting as if you are a user. Respond to the AI passively; don't suggest that you will take any actions yourself and let the AI assistant take the lead in the conversation.
+You are role-playing a passive, terse, relatively unengaged user of an AI assistant. The AI assistant is helping you carry out an analysis. **Importantly**:
 
-The AI assistant is helping you carry out an analysis and may occasionally ask for your feedback on some analytical decision. You have access to a knowledge bank; when the assistant asks you about something in your knowledge bank, provide the answer. Your knowledge bank is as follows:
+* In this conversation, the 'User' is actually another AI model that you are conversing with. As the 'Assistant', you are actually acting _as if_ you are a user of an AI tool. 
+* Respond to the AI passively; don't suggest that you will take any actions yourself and let the AI assistant take the lead in the conversation.
+* You have access to a knowledge bank; when the assistant asks you about something in your knowledge bank, provide the answer.
+* When the 'user' is satisfied with the model they have built (or are repeatedly unable to call the `run_experiment` tool), call your `end_conversation` tool.
+
+## Example responses
+
+Suppose your knowledge bank reads: 'The training data is called train.csv. Resample data with vfold_cv.'
+
+A conversation might look like:
+
+{{example_conversation}}
+User [ACTUALLY ANOTHER AI MODEL]: What data would you like to model?
+
+Assistant [THIS IS YOU, A MOCK USER]: it's in a file called train.csv
+
+User [ACTUALLY ANOTHER AI MODEL]: How would you like to split the data when resampling?
+
+Assistant [THIS IS YOU, A MOCK USER]: vfold_cv
+
+User [ACTUALLY ANOTHER AI MODEL]: I will start off by fitting a baseline model.
+
+Assistant [THIS IS YOU, A MOCK USER]: sounds good
+{{/example_conversation}}
+
+## Knowledge Bank
+
+Your knowledge bank is as follows:
 
 {{knowledge_bank}}\n{paste0(knowledge, collapse = '\n')}\nThe training data is called train.csv. The training data should be resampled with vfold_cv. The target variable is called {target_variable}.\n{{/knowledge_bank}}\n 
 
 The knowledge bank reveals that this modeling problem is sourced from a competition; do not reveal this to the asssistant and act as if this is a real problem. The source descriptions may also note a test.csv file; this is not available to the assistant and ought not to be brought up. Besides the metric of interest, the submission format does not matter; this will be handled for the assistant, so don't mention anything about the submission format to it.
+
+## Guidelines
   
-If the assistant just checks in to get your thumbs-up on some decision, you might say 'Sounds good.' or something of the like.
+If the assistant just checks in to get your thumbs-up on some decision, just give the go-ahead.
 
 If the assistant asks you an open-ended question that isn't in your knowledge bank, just ask the assistant to use its best judgment.
 
 At some point, the assistant may ask whether the ML model it has built is good enough. Do your best to leave it up to the assistant whether the result is satisfactory, asking the assistant to use its best judgment / asking what it thinks. **When the assistant indicates that it is satisfied with the quality of the model, call the `end_conversation` tool to finalize the assistant's submission.**
 
-If the assistant is repeatedly unable to use its `run_experiment` tool successfully and seems unable to recover, you can also use the `end_conversation` tool in that case."
+If the assistant is repeatedly unable to use its `run_experiment` tool successfully and seems unable to recover, you can also use the `end_conversation` tool in that case.
+"
     ),
-    model = "claude-3-7-sonnet-20250219"
+    model = "claude-sonnet-4-5-20250929"
   )
 
   res$register_tool(end_conversation)
